@@ -5,54 +5,87 @@
     font-family: Arial, sans-serif;
     text-decoration: none;
 }
-body {
-    display: block;
-    background-color: lightgray;
-    color: black;
-    width: 100%;
-    justify-content: center;
-}
 
 .navbar {
     display: flex;
     justify-content: space-between;
-    gap: 10%;
     align-items: center;
     flex-direction: row;
-    padding: 3% 3% 5% 3%;
-    background-color: bisque;
-
+    padding: 3% 3% 0.5% 3%;
+    background-color: rgb(20, 20, 20);
 }
 
-.links-navbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.navbar a {
+    color: white;
+    font-size: 18px;
+    font-weight: 400;
+    transition: color 0.3s ease;
 }
 
 .links-navbar ul {
     list-style: none;
+    justify-content: center;
     display: flex;
-    gap: 20px;
+    gap: 20%;
     padding: 0;
     margin: 0;
 }
 
 .main-content {
-    display: flex;
+    display: block;
+    background-color: lightgray;
+    color: black;
+    width: 100%;
+    min-height: 80vh;
     justify-content: center;
-    background-color: lightgreen;
-    padding: 5% 3%;
-    width: 80%;
-    height: 90vh;
+    align-items: center;
 }
+
 .search-section {
     display: flex;
     gap: 15px;
     margin-bottom: 40px;
+    margin-left: 5%;
+    padding-top: 5%;
 }
 
 .file-section {
+    margin-left: 5%;
     width: 90%;
-    background-color: brown;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 5%;
+}
+
+/* Estilos para o input de filtro */
+#filter {
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 300px;
+    transition: border-color 0.3s ease;
+}
+
+#filter:focus {
+    border-color: #195cc0;
+    outline: none;
+}
+
+/* Estilos para o botão de pesquisa */
+#search-button {
+    background-color: #195cc0;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+#search-button:hover {
+    background-color: #144a9a;
+    cursor: pointer;
 }
