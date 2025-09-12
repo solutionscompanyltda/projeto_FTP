@@ -8,28 +8,75 @@
     <title>Projeto FTP</title>
 </head>
 <body>
-    <header>
-        <nav id="navbar" class="navbar">
-        <div id="logo" class="logo">
-            <a href="/" id="icon" class="icon">Home</a>
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <a href="/" class="logo-link">
+                    <span class="logo-icon">📁</span>
+                    <span class="logo-text">FTP Manager</span>
+                </a>
+            </div>
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-
-        <div id="links-navbar" class="links-navbar">
-            <ul id="links-list">
-                <li><a href="">Arquivos</a></li>
-                <li><a href="">Treinamentos</a></li>
-                <li><a href="">Documentação</a></li>
-                <li><a href="">Help</a></li>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📄</span>
+                        <span class="nav-text">Arquivos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">🎓</span>
+                        <span class="nav-text">Treinamentos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📚</span>
+                        <span class="nav-text">Documentação</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">❓</span>
+                        <span class="nav-text">Help</span>
+                    </a>
+                </li>
             </ul>
-        </div>
-    
-        <div id="user-profile">
-            <div id="profile-navbar">
-                <a href="">Usuário</a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile" id="user-profile">
+                <div class="user-avatar">
+                    <span>👤</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Usuário</span>
+                    <span class="user-role">Admin</span>
+                </div>
+                <div class="dropdown-arrow">
+                    <span>▼</span>
+                </div>
+            </div>
+            <div class="user-dropdown" id="user-dropdown">
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item">
+                        <a href="#" class="dropdown-link" id="logout-btn">
+                            <span class="dropdown-icon">🚪</span>
+                            <span class="dropdown-text">Logout</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
-        </nav>
-    </header>
+    </aside>
     <main id="main-content" class="main-content">
         <div class="container-table100">
             <div class="wrap-table100">
@@ -137,5 +184,107 @@
     <footer>
         <p>Todos os direitos reservados. 2025</p>
     </footer>
+    
+    <!-- Overlay para mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
+    <script>
+        // Funcionalidade da sidebar
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const mainContent = document.getElementById('main-content');
+            
+            // Toggle sidebar no mobile
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    sidebarOverlay.classList.toggle('active');
+                });
+            }
+            
+            // Fechar sidebar ao clicar no overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
+            
+            // Fechar sidebar ao clicar em um link (mobile)
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Atualizar estado ativo dos links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover classe active de todos os itens
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Adicionar classe active ao item clicado
+                    this.closest('.nav-item').classList.add('active');
+                });
+            });
+            
+            // Fechar sidebar ao redimensionar para desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+            
+            // Funcionalidade do dropdown do usuário
+            const userProfile = document.getElementById('user-profile');
+            const userDropdown = document.getElementById('user-dropdown');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            if (userProfile && userDropdown) {
+                // Toggle dropdown
+                userProfile.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userProfile.classList.toggle('active');
+                    userDropdown.classList.toggle('active');
+                });
+                
+                // Fechar dropdown ao clicar fora
+                document.addEventListener('click', function(e) {
+                    if (!userProfile.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userProfile.classList.remove('active');
+                        userDropdown.classList.remove('active');
+                    }
+                });
+                
+                // Funcionalidade do logout
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Mostrar confirmação
+                        if (confirm('Tem certeza que deseja fazer logout?')) {
+                            // Aqui você pode adicionar a lógica de logout
+                            alert('Logout realizado com sucesso!');
+                            
+                            // Fechar dropdown
+                            userProfile.classList.remove('active');
+                            userDropdown.classList.remove('active');
+                        }
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
