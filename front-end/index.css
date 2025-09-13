@@ -328,7 +328,7 @@
 }
 
 /* Estilos para o botão de pesquisa */
-#search-button {
+.button {
     background-color: #195cc0;
     color: white;
     padding: 12px 24px;
@@ -338,7 +338,7 @@
     transition: background-color 0.3s ease;
 }
 
-#search-button:hover {
+.button:hover {
     background-color: #144a9a;
     cursor: pointer;
 }
