@@ -1,110 +1,163 @@
-const uploadButton = document.getElementById("upload-button"); //Chama o botão de Upload
+const uploadButton = document.getElementById("upload-button");
+const fileInput = document.getElementById("file-input");
+const fileTable = document.getElementById("file-table");
+const downloadButton = document.getElementById("download-button"); // Seleciona o novo botão
 
-const fileInput = document.getElementById("file-input"); //Chama o input de seleção de arquivo
+// Armazena os arquivos para download
+const uploadedFiles = {};
 
-const fileTable = document.getElementById("file-table"); //Chama a parte da tabela onde as linhas serão adicionadas
-
-//Para dados fictícios
-
-let fileIdCounter = 5;
-
+// Dados fictícios
+let fileIdCounter = 0;
 let fileVersionCounter = 1.0;
 
-//Oculta o botão input de arquivos
-
+// Oculta o botão de input
 fileInput.style.display = "none";
 
-//Adiciona o evento de click no botão Upload
-
+// Adiciona evento de clique no botão Upload
 uploadButton.addEventListener("click", () => {
-  //Quando clica no botão de Upload, vai acionar o input de arquivos
-
-  fileInput.click();
+    fileInput.click();
 });
 
-//Evento para quando o arquivo do input muda
-
+// Evento para quando o arquivo do input muda
 fileInput.addEventListener("change", (event) => {
-  //Vai pegar o primeiro arquivo da lista
+    // Pega o primeiro arquivo da lista
+    const file = event.target.files[0];
 
-  const file = event.target.files[0]; //Verifca se algum arquivo foi selecionado
+    // Verifica se algum arquivo foi selecionado
+    if (file) {
+        // Pega o nome do arquivo, converte para minúsculo e checa a extensão
+        const fileNameConvert = file.name.toLowerCase();
+        
+        // Validação da extensão do arquivo
+        if (!fileNameConvert.endsWith('.zip') && !fileNameConvert.endsWith('.rar')) {
+            alert("Erro: Tipo de arquivo inválido. Por favor, selecione um arquivo .zip ou .rar.");
+            event.target.value = ""; // Limpa o input
+            return;
+        }
 
-  if (file) {
-    //Vai incrementar o contador do arquivo novo
+        fileIdCounter++;
+        fileVersionCounter = (parseFloat(fileVersionCounter) + 0.1).toFixed(1);
 
-    fileIdCounter++;
+        // Adiciona o arquivo ao objeto uploadedFiles
+        uploadedFiles[fileIdCounter] = {
+            fileObject: file,
+            version: fileVersionCounter
+        };
 
-    fileVersionCounter = (parseFloat(fileVersionCounter) + 0.1).toFixed(1); //Cria uma nova linha da tabela
+        const newRow = document.createElement("tr");
+        newRow.setAttribute("data-file-id", fileIdCounter); // Adiciona um atributo para identificar a linha
 
-    const newRow = document.createElement("tr"); //Adiciona o checkbox
+        // Adiciona o checkbox
+        const fileCheck = document.createElement("td");
+        fileCheck.innerHTML = `<input type="checkbox" name="file-check" class="file-checkbox" title="Selecionar arquivo">`;
+        newRow.appendChild(fileCheck);
 
-    const fileCheck = document.createElement("td");
+        // Adiciona o botão de download individual
+        const btnDownload = document.createElement("td");
+        const downloadLink = document.createElement("a");
+        const fileUrl = URL.createObjectURL(file);
+        downloadLink.href = fileUrl;
+        downloadLink.download = file.name;
+        downloadLink.textContent = "⬇️";
+        btnDownload.appendChild(downloadLink);
+        newRow.appendChild(btnDownload);
 
-    fileCheck.innerHTML = `<input type="checkbox" name="file-check" id="file-check-1" class="file-checkbox" title="Selecionar arquivo">`;
+        // Adiciona o id do arquivo
+        const fileId = document.createElement("td");
+        const formatId = String(fileIdCounter).padStart(3, "0");
+        fileId.textContent = formatId;
+        newRow.appendChild(fileId);
 
-    newRow.appendChild(fileCheck); //Adiciona o botão de download
+        // Adiciona o nome do arquivo
+        const fileName = document.createElement("td");
+        fileName.textContent = file.name;
+        newRow.appendChild(fileName);
 
-    const btnDonwload = document.createElement("td");
+        // Adiciona a versão do arquivo
+        const fileVersion = document.createElement("td");
+        fileVersion.textContent = fileVersionCounter;
+        newRow.appendChild(fileVersion);
 
-    btnDonwload.textContent = "⬇️";
+        // Adiciona a localização do arquivo
+        const fileLocation = document.createElement("td");
+        fileLocation.textContent = "/server/uploads";
+        newRow.appendChild(fileLocation);
 
-    newRow.appendChild(btnDonwload); //Adiciona o id do arquivo
+        // Adiciona e converte o tamanho do arquivo
+        const fileColumn = document.createElement("td");
+        const fileSize = file.size;
+        const formatSize =
+            fileSize > 1024 * 1024
+                ? `${(fileSize / (1024 * 1024)).toFixed(2)} MB`
+                : `${(fileSize / 1024).toFixed(2)} KB`;
+        fileColumn.textContent = formatSize;
+        newRow.appendChild(fileColumn);
 
-    const fileId = document.createElement("td");
+        // Adiciona quantidade de downloads
+        const fileDownloads = document.createElement("td");
+        fileDownloads.textContent = 0;
+        newRow.appendChild(fileDownloads);
 
-    const formatId = String(fileIdCounter).padStart(3, "0"); //Converte para String e adiciona zeros a esquerda
+        fileTable.appendChild(newRow);
 
-    fileId.textContent = formatId;
+        window.addEventListener("beforeunload", () => {
+            URL.revokeObjectURL(fileUrl);
+        });
 
-    newRow.appendChild(fileId); //Adiciona o nome do arquivo
-
-    const fileName = document.createElement("td");
-
-    fileName.textContent = file.name;
-
-    newRow.appendChild(fileName); //Adiciona a versão do arquivo
-
-    const fileVersion = document.createElement("td");
-
-    fileVersion.textContent = fileVersionCounter;
-
-    newRow.appendChild(fileVersion); //Adiciona a localização do arquivo
-
-    const fileLocation = document.createElement("td");
-
-    fileLocation.textContent = "/server/uploads"; //Caminho fictício
-
-    newRow.appendChild(fileLocation); //Adiciona e converte o tamanho do arquivo
-
-    const fileColumn = document.createElement("td");
-
-    const fileSize = file.size; //Retorna o tamanho do arquivo //Verifica o tamanho do arquivo
-
-    const formatSize =
-      fileSize > 1024 * 1024
-        ? `${(fileSize / (1024 * 1024)).toFixed(2)} MB` //Se maior que o 1 MB
-        : `${(fileSize / 1024).toFixed(2)} KB`; //Se menor que 1 MB
-
-    fileColumn.textContent = formatSize;
-
-    newRow.appendChild(fileColumn); //Adiciona um valor a quantidade de downloads
-
-    const fileDonwloads = document.createElement("td");
-
-    fileDonwloads.textContent = 0;
-
-    newRow.appendChild(fileDonwloads); //Adiciona a nova linha a tabela
-
-    fileTable.appendChild(newRow); //Limpa o valor de input
-
-    event.target.value = "";
-  }
+        event.target.value = "";
+    }
 });
 
-function validateFileType(selectorField) {
-  if (fileInput.files[0].type != "application/x-zip-compressed") {
-    alert("Erro: Tipo arquivo inválido, selecione arquivo .rar!");
+// Adiciona o evento de clique ao botão "Download Selecionados"
+downloadButton.addEventListener("click", () => {
+    const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+        alert("Nenhum arquivo selecionado para download.");
+        return;
+    }
 
-    fileInput.value = "";
-  }
-}
+    selectedCheckboxes.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const fileId = row.getAttribute('data-file-id');
+        const fileInfo = uploadedFiles[fileId];
+
+        if (fileInfo) {
+            const file = fileInfo.fileObject;
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(file);
+            link.download = file.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Revogar URL após o download
+            URL.revokeObjectURL(link.href);
+        }
+    });
+
+    alert(`${selectedCheckboxes.length} arquivo(s) selecionado(s) foram baixados!`);
+
+    // Limpa os checkboxes selecionados após o download
+    selectedCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Opcionalmente, desmarque o "Selecionar todos" se ele estiver marcado
+    const checkAll = document.getElementById('check-all');
+    if (checkAll.checked) {
+        checkAll.checked = false;
+    }
+});
+
+// Ativa a funcionalidade do checkbox "check-all"
+const checkAll = document.getElementById('check-all');
+
+checkAll.addEventListener('change', () => {
+    // Seleciona todos os checkboxes individuais com a classe .file-checkbox
+    const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+
+    // Percorre cada checkbox e define seu estado (checked) como o mesmo do "check-all"
+    fileCheckboxes.forEach(checkbox => {
+        checkbox.checked = checkAll.checked;
+    });
+});

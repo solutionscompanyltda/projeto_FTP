@@ -84,17 +84,15 @@
                     <input type="text" name="filter" id="filter" placeholder="Filtrar arquivos">
                     <button id="search-button" class="button">Pesquisar</button>
                     <button id="upload-button" class="button">Upload</button>
-                    <input type="file" id="file-input" onchange="validateFileType('file-input')" accept="application/x-zip-compressed" >
+                    <button id="download-button" class="button">Download</button>
+                    <input type="file" id="file-input" accept=".zip,.rar,application/zip,application/x-zip-compressed,application/vnd.rar,application/x-rar-compressed">
                 </section>
                 <section id="file-section" class="file-section">
                     <table>
                     <thead class="table100-head">
                         <tr>
-                            <th class="column1">
-                                
+                            <th class="column1"> 
                                     <input type="checkbox" name="check-all" id="check-all" title="Selecionar todos os arquivos">
-                                    
-                                
                             </th>
                             <th class="column2"></th>
                             <th class="column2">ID</th>
@@ -105,79 +103,7 @@
                             <th class="column2">Downloads</th>
                         </tr>
                     </thead>
-                    <tbody id="file-table">
-                        <!-- lista temporária para facilitar estilização  -->
-                        <tr>
-                            <td>
-                                <label for="file-check-1">
-                                    <input type="checkbox" name="file-check" id="file-check-1" class="file-checkbox" title="Selecionar arquivo">
-                                </label>
-                            </td>
-                            <td>⬇️</td>
-                            <td>001</td>
-                            <td>documento.pdf</td>
-                            <td>1.0</td>
-                            <td>/uploads/docs</td>
-                            <td>2.5 MB</td>
-                            <td>15</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="file-check-2">
-                                    <input type="checkbox" name="file-check" id="file-check-2" class="file-checkbox" title="Selecionar arquivo">
-                                </label>
-                            </td>
-                            <td>⬇️</td>
-                            <td>002</td>
-                            <td>relatorio.xlsx</td>
-                            <td>2.1</td>
-                            <td>/uploads/reports</td>
-                            <td>1.8 MB</td>
-                            <td>8</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="file-check-3">
-                                    <input type="checkbox" name="file-check" id="file-check-3" class="file-checkbox" title="Selecionar arquivo">
-                                </label>
-                            </td>
-                            <td>⬇️</td>
-                            <td>003</td>
-                            <td>imagem.png</td>
-                            <td>1.0</td>
-                            <td>/uploads/images</td>
-                            <td>850 KB</td>
-                            <td>23</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="file-check-4">
-                                    <input type="checkbox" name="file-check" id="file-check-4" class="file-checkbox" title="Selecionar arquivo">
-                                </label>
-                            </td>
-                            <td>⬇️</td>
-                            <td>004</td>
-                            <td>manual.txt</td>
-                            <td>3.2</td>
-                            <td>/uploads/docs</td>
-                            <td>120 KB</td>
-                            <td>5</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="file-check-5">
-                                    <input type="checkbox" name="file-check" id="file-check-5" class="file-checkbox" title="Selecionar arquivo">
-                                </label>
-                            </td>
-                            <td>⬇️</td>
-                            <td>005</td>
-                            <td>audio.mp3</td>
-                            <td>1.0</td>
-                            <td>/uploads/media</td>
-                            <td>4.2 MB</td>
-                            <td>12</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="file-table"></tbody>
                 </table>
                 </section>
             </div>
