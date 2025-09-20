@@ -17,11 +17,11 @@ uploadButton.addEventListener('click', () => {
 
 //Evento para quando o arquivo do input muda
 fileInput.addEventListener('change', (event) => {
-    //Vai pegar o primeiro arquivo da lista
-    const file = event.target.files[0]
-    
-    //Verifca se algum arquivo foi selecionado
-    if (file) {
+    // Pega o arquivo selecionado
+    const file = event.target.files[0];
+
+    // Verifica se algum arquivo foi selecionado e se ele é válido
+    if (file && validateFileType(file)) {
         //Vai incrementar o contador do arquivo novo
         fileIdCounter++;
         fileVersionCounter = (parseFloat(fileVersionCounter) + 0.1).toFixed(1);
@@ -41,8 +41,7 @@ fileInput.addEventListener('change', (event) => {
 
         //Adiciona o id do arquivo
         const fileId = document.createElement('td');
-        
-        const formatId = String(fileIdCounter).padStart(3, '0');//Converte para String e adiciona zeros a esquerda
+        const formatId = String(fileIdCounter).padStart(3, '0'); //Converte para String e adiciona zeros a esquerda
         fileId.textContent = formatId;
         newRow.appendChild(fileId);
 
@@ -66,7 +65,7 @@ fileInput.addEventListener('change', (event) => {
         const fileSize = file.size; //Retorna o tamanho do arquivo
         //Verifica o tamanho do arquivo
         const formatSize = fileSize > 1024 * 1024 ? `${(fileSize / (1024 * 1024)).toFixed(2)} MB` : //Se maior que o 1 MB
-                                                    `${(fileSize / 1024).toFixed(2)} KB`; //Se menor que 1 MB
+                                    `${(fileSize / 1024).toFixed(2)} KB`; //Se menor que 1 MB
         fileColumn.textContent = formatSize;
         newRow.appendChild(fileColumn);
 
@@ -78,7 +77,23 @@ fileInput.addEventListener('change', (event) => {
         //Adiciona a nova linha a tabela
         fileTable.appendChild(newRow);
 
-        //Limpa o valor de input
-        event.target.value = ''
-    };
-})
+        // Limpa o valor do input para permitir o evento `change` na próxima vez
+        event.target.value = '';
+    } else {
+        // Se a validação falhar, apenas limpa o input
+        event.target.value = '';
+    }
+});
+
+// Função de validação de tipo de arquivo
+function validateFileType(file) {
+    const allowedMimeTypes = ['application/x-zip-compressed', 'application/x-rar-compressed'];
+    
+    // Verifica se o tipo do arquivo está na lista de tipos permitidos
+    if (allowedMimeTypes.includes(file.type)) {
+        return true;
+    } else {
+        alert('Erro: Tipo de arquivo inválido. Por favor, selecione um arquivo .rar!');
+        return false;
+    }
+}

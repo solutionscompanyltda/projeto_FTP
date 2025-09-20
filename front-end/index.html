@@ -84,7 +84,7 @@
                     <input type="text" name="filter" id="filter" placeholder="Filtrar arquivos">
                     <button id="search-button" class="button">Pesquisar</button>
                     <button id="upload-button" class="button">Upload</button>
-                    <input type="file" id="file-input">
+                    <input type="file" id="file-input" onchange="validateFileType('file-input')" accept="application/x-zip-compressed" >
                 </section>
                 <section id="file-section" class="file-section">
                     <table>
