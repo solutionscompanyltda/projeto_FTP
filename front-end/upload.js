@@ -19,98 +19,117 @@ uploadButton.addEventListener("click", () => {
 });
 
 // Evento para quando o arquivo do input muda
-fileInput.addEventListener("change", (event) => {
-  // Pega o primeiro arquivo da lista
-  const file = event.target.files[0];
+fileInput.addEventListener("change", async (event) => {
+    // Pega o primeiro arquivo da lista
+    const originalFile = event.target.files[0];
 
-  // Verifica se algum arquivo foi selecionado
-  if (file) {
-    // Pega o nome do arquivo, converte para minúsculo e checa a extensão
-    const fileNameConvert = file.name.toLowerCase();
+    // Verifica se algum arquivo foi selecionado
+    if (originalFile) {
+        
+        // ----------------------------------------------------
+        // NOVO PASSO: COMPACTAR O ARQUIVO PARA ZIP USANDO JSZIP
+        // ----------------------------------------------------
 
-    // Validação da extensão do arquivo
-    if (
-      !fileNameConvert.endsWith(".zip") &&
-      !fileNameConvert.endsWith(".rar")
-    ) {
-      alert(
-        "Erro: Tipo de arquivo inválido. Por favor, selecione um arquivo .zip ou .rar."
-      );
-      event.target.value = ""; // Limpa o input
-      return;
+        // 1. Cria uma nova instância do ZIP
+        const zip = new JSZip();
+
+        // 2. Adiciona o arquivo original ao ZIP. O primeiro argumento é o nome do arquivo dentro do ZIP.
+        // O JSZip fará a compactação automaticamente.
+        zip.file(originalFile.name, originalFile);
+        
+        // 3. Gera o arquivo ZIP resultante como um Blob
+        const zippedBlob = await zip.generateAsync({ 
+            type: "blob",
+            compression: "DEFLATE", // Compactação padrão
+            compressionOptions: { level: 9 } // Nível máximo de compactação
+        });
+
+        // 4. Cria um novo objeto File a partir do Blob compactado
+        const fileNameZip = `${originalFile.name.substring(0, originalFile.name.lastIndexOf('.')) || originalFile.name}.zip`;
+        const file = new File([zippedBlob], fileNameZip, { type: "application/zip" });
+        
+        // Agora 'file' é o novo arquivo .zip compactado pronto para ser inserido/enviado.
+        
+        // ----------------------------------------------------
+        // FIM DA COMPACTAÇÃO - INÍCIO DA LÓGICA DE TABELA
+        // ----------------------------------------------------
+        
+        // (Removida a validação de extensão, já que o arquivo será .zip)
+        
+        fileIdCounter++;
+        fileVersionCounter = (parseFloat(fileVersionCounter) + 0.1).toFixed(1);
+
+        // Adiciona o NOVO arquivo .zip ao objeto uploadedFiles
+        uploadedFiles[fileIdCounter] = {
+            fileObject: file, // Aqui é o novo arquivo ZIP
+            version: fileVersionCounter,
+        };
+
+        const newRow = document.createElement("tr");
+        newRow.setAttribute("data-file-id", fileIdCounter); // Adiciona um atributo para identificar a linha
+
+        // O restante da sua lógica de criação de tabela...
+
+        // Adiciona o checkbox
+        const fileCheck = document.createElement("td");
+        fileCheck.innerHTML = `<input type="checkbox" name="file-check" class="file-checkbox" title="Selecionar arquivo">`;
+        newRow.appendChild(fileCheck);
+
+        // Adiciona o botão de download individual
+        const btnDownload = document.createElement("td");
+        const downloadLink = document.createElement("a");
+        // Cria a URL para o NOVO arquivo ZIP
+        const fileUrl = URL.createObjectURL(file); 
+        downloadLink.href = fileUrl;
+        downloadLink.download = file.name;
+        downloadLink.textContent = "⬇️";
+        btnDownload.appendChild(downloadLink);
+        newRow.appendChild(btnDownload);
+
+        // Adiciona o id do arquivo
+        const fileId = document.createElement("td");
+        const formatId = String(fileIdCounter).padStart(3, "0");
+        fileId.textContent = formatId;
+        newRow.appendChild(fileId);
+
+        // Adiciona o nome do arquivo (agora .zip)
+        const fileName = document.createElement("td");
+        fileName.textContent = file.name;
+        newRow.appendChild(fileName);
+
+        // Adiciona a versão do arquivo
+        const fileVersion = document.createElement("td");
+        fileVersion.textContent = fileVersionCounter;
+        newRow.appendChild(fileVersion);
+
+        // Adiciona a localização do arquivo
+        const fileLocation = document.createElement("td");
+        fileLocation.textContent = "/server/uploads";
+        newRow.appendChild(fileLocation);
+
+        // Adiciona e converte o tamanho do arquivo
+        const fileColumn = document.createElement("td");
+        const fileSize = file.size; // Tamanho do arquivo ZIP
+        const formatSize =
+            fileSize > 1024 * 1024
+                ? `${(fileSize / (1024 * 1024)).toFixed(2)} MB`
+                : `${(fileSize / 1024).toFixed(2)} KB`;
+        fileColumn.textContent = formatSize;
+        newRow.appendChild(fileColumn);
+
+        // Adiciona quantidade de downloads
+        const fileDownloads = document.createElement("td");
+        fileDownloads.textContent = 0;
+        newRow.appendChild(fileDownloads);
+
+        fileTable.appendChild(newRow);
+
+        window.addEventListener("beforeunload", () => {
+            URL.revokeObjectURL(fileUrl);
+        });
+
+        event.target.value = "";
     }
-
-    fileIdCounter++;
-    fileVersionCounter = (parseFloat(fileVersionCounter) + 0.1).toFixed(1);
-
-    // Adiciona o arquivo ao objeto uploadedFiles
-    uploadedFiles[fileIdCounter] = {
-      fileObject: file,
-      version: fileVersionCounter,
-    };
-
-    const newRow = document.createElement("tr");
-    newRow.setAttribute("data-file-id", fileIdCounter); // Adiciona um atributo para identificar a linha
-
-    // Adiciona o checkbox
-    const fileCheck = document.createElement("td");
-    fileCheck.innerHTML = `<input type="checkbox" name="file-check" class="file-checkbox" title="Selecionar arquivo">`;
-    newRow.appendChild(fileCheck);
-
-    // Adiciona o botão de download individual
-    const btnDownload = document.createElement("td");
-    const downloadLink = document.createElement("a");
-    const fileUrl = URL.createObjectURL(file);
-    downloadLink.href = fileUrl;
-    downloadLink.download = file.name;
-    downloadLink.textContent = "⬇️";
-    btnDownload.appendChild(downloadLink);
-    newRow.appendChild(btnDownload);
-
-    // Adiciona o id do arquivo
-    const fileId = document.createElement("td");
-    const formatId = String(fileIdCounter).padStart(3, "0");
-    fileId.textContent = formatId;
-    newRow.appendChild(fileId);
-
-    // Adiciona o nome do arquivo
-    const fileName = document.createElement("td");
-    fileName.textContent = file.name;
-    newRow.appendChild(fileName);
-
-    // Adiciona a versão do arquivo
-    const fileVersion = document.createElement("td");
-    fileVersion.textContent = fileVersionCounter;
-    newRow.appendChild(fileVersion);
-
-    // Adiciona a localização do arquivo
-    const fileLocation = document.createElement("td");
-    fileLocation.textContent = "/server/uploads";
-    newRow.appendChild(fileLocation);
-
-    // Adiciona e converte o tamanho do arquivo
-    const fileColumn = document.createElement("td");
-    const fileSize = file.size;
-    const formatSize =
-      fileSize > 1024 * 1024
-        ? `${(fileSize / (1024 * 1024)).toFixed(2)} MB`
-        : `${(fileSize / 1024).toFixed(2)} KB`;
-    fileColumn.textContent = formatSize;
-    newRow.appendChild(fileColumn);
-
-    // Adiciona quantidade de downloads
-    const fileDownloads = document.createElement("td");
-    fileDownloads.textContent = 0;
-    newRow.appendChild(fileDownloads);
-
-    fileTable.appendChild(newRow);
-
-    window.addEventListener("beforeunload", () => {
-      URL.revokeObjectURL(fileUrl);
-    });
-
-    event.target.value = "";
-  }
 });
 
 // Adiciona o evento de clique ao botão "Download Selecionados"
